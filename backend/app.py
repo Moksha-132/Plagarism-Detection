@@ -180,8 +180,9 @@ def handle_contact():
         print("Mail error:", str(e))
         return jsonify({'error': str(e)}), 500
 
+if not os.path.exists('dataset'):
+    os.makedirs('dataset')
+init_db()
+
 if __name__ == '__main__':
-    if not os.path.exists('dataset'):
-        os.makedirs('dataset')
-    init_db()
     app.run(debug=True, port=5000)
