@@ -14,11 +14,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE_PATH = os.path.join(BASE_DIR, 'database.db')
+DATASET_DIR = os.path.join(BASE_DIR, 'dataset')
+
 app = Flask(__name__)
 CORS(app)
 
 def connect_db():
-    return sqlite3.connect('database.db')
+    return sqlite3.connect(DATABASE_PATH)
 
 def init_db():
     conn = connect_db()
@@ -109,12 +113,12 @@ def check():
     if not input_text:
         return jsonify({'error': 'No content provided'}), 400
     allowed = ('.txt', '.py', '.js', '.jsx', '.tsx', '.html', '.css', '.java', '.cpp', '.c')
-    target_files = [f for f in os.listdir('dataset') if f.lower().endswith(allowed)]   
+    target_files = [f for f in os.listdir(DATASET_DIR) if f.lower().endswith(allowed)]   
     final_sim = 0
     if target_files:
         docs = []
         for f_name in target_files:
-            f_path = os.path.join('dataset', f_name)
+            f_path = os.path.join(DATASET_DIR, f_name)
             with open(f_path, 'r', encoding='utf-8', errors='ignore') as f_obj:
                 docs.append(f_obj.read())      
         docs.append(input_text)
@@ -180,8 +184,8 @@ def handle_contact():
         print("Mail error:", str(e))
         return jsonify({'error': str(e)}), 500
 
-if not os.path.exists('dataset'):
-    os.makedirs('dataset')
+if not os.path.exists(DATASET_DIR):
+    os.makedirs(DATASET_DIR)
 init_db()
 
 if __name__ == '__main__':
