@@ -52,7 +52,7 @@ function Dashboard() {
 
   const handleDownloadReport = async () => {
     if (!results) return;
-    
+
     try {
       const res = await fetch('http://localhost:5000/report', {
         method: 'POST',
@@ -70,7 +70,7 @@ function Dashboard() {
         alert(`Failed to generate report: ${errorData.error || 'Unknown error'}`);
         return;
       }
-      
+
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -102,22 +102,22 @@ function Dashboard() {
       <div className="card" style={{ marginTop: '4rem' }}>
         <h2 style={{ color: '#0a192f', marginBottom: '0.5rem' }}>Full Content Analysis</h2>
         <p style={{ color: '#64748b', marginBottom: '2rem' }}>Check for plagiarism and AI-generated content in your code or scripts.</p>
-        
+
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-          <button 
+          <button
             onClick={() => { setFile(null); fileInputRef.current.value = ''; }}
-            style={{ 
-              background: !file ? 'var(--primary)' : '#f1f5f9', 
+            style={{
+              background: !file ? 'var(--primary)' : '#f1f5f9',
               color: !file ? 'black' : '#64748b',
               padding: '0.6rem 1.5rem'
             }}
           >
             Paste Content
           </button>
-          <button 
+          <button
             onClick={() => fileInputRef.current.click()}
-            style={{ 
-              background: file ? 'var(--primary)' : '#f1f5f9', 
+            style={{
+              background: file ? 'var(--primary)' : '#f1f5f9',
               color: file ? 'black' : '#64748b',
               padding: '0.6rem 1.5rem',
               display: 'flex',
@@ -128,11 +128,11 @@ function Dashboard() {
             <Upload size={18} />
             {file ? file.name : 'Upload File'}
           </button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            style={{ display: 'none' }} 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
           />
         </div>
 
@@ -161,9 +161,9 @@ function Dashboard() {
             <p style={{ fontSize: '0.9rem' }}>File ready for analysis</p>
           </div>
         )}
-        
-        <button 
-          onClick={handleAnalysis} 
+
+        <button
+          onClick={handleAnalysis}
           disabled={loading || (!text && !file)}
           style={{ marginTop: '1.5rem', width: '100%', padding: '1.2rem' }}
         >
@@ -196,10 +196,10 @@ function Dashboard() {
 
             <div style={{ marginBottom: '2rem' }}>
               <h4 style={{ color: '#0a192f', marginBottom: '1rem' }}>Analysis Preview</h4>
-              <div style={{ 
-                background: '#f8fafc', 
-                border: '1px solid #e2e8f0', 
-                borderRadius: '12px', 
+              <div style={{
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
                 padding: '1.5rem',
                 maxHeight: '300px',
                 overflowY: 'auto',
@@ -208,7 +208,7 @@ function Dashboard() {
                 fontSize: '0.9rem'
               }}>
                 {results.ai_lines.map((line, i) => (
-                  <div key={i} style={{ 
+                  <div key={i} style={{
                     backgroundColor: line.is_ai ? 'rgba(239, 68, 68, 0.15)' : 'rgba(34, 197, 94, 0.15)',
                     padding: '2px 4px',
                     borderRadius: '4px'
@@ -219,12 +219,12 @@ function Dashboard() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={handleDownloadReport}
-              style={{ 
-                width: '100%', 
-                background: 'white', 
-                color: 'var(--dark-bg)', 
+              style={{
+                width: '100%',
+                background: 'white',
+                color: 'var(--dark-bg)',
                 border: '2px solid var(--dark-bg)',
                 display: 'flex',
                 alignItems: 'center',

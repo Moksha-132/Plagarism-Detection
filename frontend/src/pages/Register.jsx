@@ -14,7 +14,7 @@ function Register() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
-    
+
     if (res.ok) {
       alert('Account created successfully!');
       navigate('/login');
@@ -39,25 +39,25 @@ function Register() {
         <div className="auth-form card" style={{ marginTop: '6rem', marginBottom: '10rem' }}>
           <h2 style={{ marginBottom: '1.5rem', textAlign: 'center', color: '#0a192f' }}>Join PlagCheck</h2>
           <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '2rem' }}>Create an account to start protecting your original work.</p>
-          
+
           <form onSubmit={handleSubmit}>
-            <input 
-              type="text" 
-              placeholder="Choose Username" 
+            <input
+              type="text"
+              placeholder="Choose Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
             />
-            <input 
-              type="password" 
-              placeholder="Create Password" 
+            <input
+              type="password"
+              placeholder="Create Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
             <button type="submit" style={{ width: '100%', marginTop: '1rem', padding: '1rem' }}>Create Account</button>
           </form>
-          
+
           <p className="link-text" style={{ marginTop: '2rem' }}>
             Already have an account? <Link to="/login">Sign in here</Link>
           </p>

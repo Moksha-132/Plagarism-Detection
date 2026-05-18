@@ -40,7 +40,7 @@ function Contact() {
   return (
     <div>
       <div className="container">
-        <motion.nav 
+        <motion.nav
           className="navbar"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -53,8 +53,8 @@ function Contact() {
           </div>
         </motion.nav>
 
-        <motion.section 
-          className="hero" 
+        <motion.section
+          className="hero"
           style={{ padding: '6rem 0' }}
           {...fadeInUp}
         >
@@ -63,14 +63,14 @@ function Contact() {
         </motion.section>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', marginBottom: '8rem' }}>
-          <motion.div 
+          <motion.div
             className="card"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
             <h2 style={{ marginBottom: '2rem' }}>Contact Information</h2>
-            
+
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
               <Mail color="var(--primary)" />
               <div>
@@ -96,7 +96,7 @@ function Contact() {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="card"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
