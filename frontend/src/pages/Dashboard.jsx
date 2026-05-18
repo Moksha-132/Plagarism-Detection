@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Clock, Trash2, Eye, Download } from 'lucide-react';
+
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000'
+  : 'https://moksha132.pythonanywhere.com';
 
 function Dashboard() {
   const [text, setText] = useState('');
@@ -8,6 +12,8 @@ function Dashboard() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [hoveredId, setHoveredId] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -16,9 +22,23 @@ function Dashboard() {
     if (!saved) {
       navigate('/login');
     } else {
-      setUser(JSON.parse(saved));
+      const parsedUser = JSON.parse(saved);
+      setUser(parsedUser);
+      fetchHistory(parsedUser.id);
     }
   }, []);
+
+  const fetchHistory = async (userId) => {
+    try {
+      const res = await fetch(`${API_BASE}/history/${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      }
+    } catch (err) {
+      console.error("Error fetching history:", err);
+    }
+  };
 
   const handleAnalysis = async () => {
     if (!text && !file) return;
@@ -27,19 +47,24 @@ function Dashboard() {
     const formData = new FormData();
     if (file) {
       formData.append('file', file);
-    } else {
-      formData.append('text', text);
+      if (user?.id) {
+        formData.append('user_id', user.id);
+      }
     }
 
-    const res = await fetch('https://moksha132.pythonanywhere.com/check', {
+    const res = await fetch(`${API_BASE}/check`, {
       method: 'POST',
-      body: file ? formData : JSON.stringify({ text }),
+      body: file ? formData : JSON.stringify({ text, user_id: user?.id }),
       headers: file ? {} : { 'Content-Type': 'application/json' }
     });
 
     const data = await res.json();
     setResults(data);
     setLoading(false);
+
+    if (user?.id) {
+      fetchHistory(user.id);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -54,7 +79,7 @@ function Dashboard() {
     if (!results) return;
 
     try {
-      const res = await fetch('https://moksha132.pythonanywhere.com/report', {
+      const res = await fetch(`${API_BASE}/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -82,6 +107,54 @@ function Dashboard() {
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
+  };
+
+  const handleDeleteScan = async (scanId, e) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this scan from history?")) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/history/${scanId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        setHistory(prev => prev.filter(item => item.id !== scanId));
+      }
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  const handleViewScan = (scan) => {
+    setResults({
+      plagiarism_score: scan.plagiarism_score,
+      ai_score: scan.ai_score,
+      original_text: scan.original_text,
+      ai_lines: [{ text: scan.original_text, is_ai: scan.ai_score > 30, score: scan.ai_score }]
+    });
+
+    if (scan.filename && scan.filename !== "Raw Text") {
+      setFile({ name: scan.filename });
+      setText('');
+    } else {
+      setFile(null);
+      setText(scan.original_text);
+    }
+
+    window.scrollTo({ top: 350, behavior: 'smooth' });
+  };
+
+  const handleDownloadSource = (scan, e) => {
+    e.stopPropagation();
+    const blob = new Blob([scan.original_text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = scan.filename && scan.filename !== "Raw Text" ? scan.filename : "scanned_text.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const logout = () => {
@@ -235,6 +308,132 @@ function Dashboard() {
               <FileText size={20} />
               Download Detailed PDF Report
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Scanned History Card */}
+      <div className="card" style={{ marginTop: '3rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <Clock size={24} style={{ color: 'var(--primary)' }} />
+          <h2 style={{ color: '#0a192f', margin: 0 }}>Scanned History</h2>
+        </div>
+        <p style={{ color: '#64748b', marginBottom: '2rem' }}>Access and manage your past plagiarism and AI analysis results.</p>
+        
+        {history.length === 0 ? (
+          <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>
+            <Clock size={36} style={{ marginBottom: '0.75rem', opacity: 0.5 }} />
+            <p style={{ fontWeight: '500' }}>No scans recorded yet</p>
+            <p style={{ fontSize: '0.9rem' }}>Run a content analysis above to start tracking history.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {history.map((scan) => (
+              <div 
+                key={scan.id} 
+                onClick={() => handleViewScan(scan)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1.25rem 1.5rem',
+                  background: hoveredId === scan.id ? '#f1f5f9' : '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '14px',
+                  cursor: 'pointer',
+                  transform: hoveredId === scan.id ? 'translateY(-2px)' : 'none',
+                  boxShadow: hoveredId === scan.id ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={() => setHoveredId(scan.id)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
+                  <FileText size={24} style={{ color: '#64748b', flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontWeight: '600', color: '#0a192f', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                      {scan.filename}
+                    </p>
+                    <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0.2rem 0 0 0' }}>
+                      {new Date(scan.timestamp).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block' }}>Plag Score</span>
+                    <span style={{ fontWeight: '700', color: scan.plagiarism_score > 25 ? '#ef4444' : '#22c55e' }}>
+                      {scan.plagiarism_score}%
+                    </span>
+                  </div>
+                  
+                  <div style={{ textAlign: 'right', minWidth: '70px' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block' }}>AI Score</span>
+                    <span style={{ fontWeight: '700', color: scan.ai_score > 30 ? '#ef4444' : '#22c55e' }}>
+                      {scan.ai_score}%
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleViewScan(scan); }}
+                      style={{ 
+                        padding: '0.5rem', 
+                        background: 'white', 
+                        border: '1px solid #cbd5e1', 
+                        color: '#475569', 
+                        borderRadius: '8px', 
+                        boxShadow: 'none', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        transform: 'none',
+                      }}
+                      title="Load Scan Details"
+                    >
+                      <Eye size={16} />
+                    </button>
+                    <button 
+                      onClick={(e) => handleDownloadSource(scan, e)}
+                      style={{ 
+                        padding: '0.5rem', 
+                        background: 'white', 
+                        border: '1px solid #cbd5e1', 
+                        color: '#475569', 
+                        borderRadius: '8px', 
+                        boxShadow: 'none', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        transform: 'none',
+                      }}
+                      title="Download Original File"
+                    >
+                      <Download size={16} />
+                    </button>
+                    <button 
+                      onClick={(e) => handleDeleteScan(scan.id, e)}
+                      style={{ 
+                        padding: '0.5rem', 
+                        background: '#fef2f2', 
+                        border: '1px solid #fee2e2', 
+                        color: '#ef4444', 
+                        borderRadius: '8px', 
+                        boxShadow: 'none', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        transform: 'none',
+                      }}
+                      title="Delete Scan"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

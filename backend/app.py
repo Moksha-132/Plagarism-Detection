@@ -4,6 +4,7 @@ import sqlite3
 import os
 import math
 import re
+import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from report_pdf import create_pdf_report
@@ -16,7 +17,7 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(BASE_DIR, 'database.db')
-DATASET_DIR = os.path.join(BASE_DIR, 'dataset')
+DATASET_DIR = os.path.join(os.path.dirname(BASE_DIR), 'dataset')
 
 app = Flask(__name__)
 CORS(app)
@@ -27,6 +28,16 @@ def connect_db():
 def init_db():
     conn = connect_db()
     conn.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)')
+    conn.execute('''CREATE TABLE IF NOT EXISTS history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        filename TEXT,
+        plagiarism_score REAL,
+        ai_score REAL,
+        timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+        original_text TEXT,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )''')
     conn.commit()
 
 def get_entropy_score(input_text):
@@ -106,12 +117,21 @@ def login():
 @app.route('/check', methods=['POST'])
 def check():
     input_text = ""
+    filename = None
+    user_id = None
     if 'file' in request.files:
-        input_text = request.files['file'].read().decode('utf-8', errors='ignore')
+        file_obj = request.files['file']
+        filename = file_obj.filename
+        input_text = file_obj.read().decode('utf-8', errors='ignore')
+        user_id = request.form.get('user_id')
     else:
-        input_text = request.json.get('text', '')       
+        payload = request.json or {}
+        input_text = payload.get('text', '')       
+        user_id = payload.get('user_id')
+        
     if not input_text:
         return jsonify({'error': 'No content provided'}), 400
+    
     allowed = ('.txt', '.py', '.js', '.jsx', '.tsx', '.html', '.css', '.java', '.cpp', '.c')
     target_files = [f for f in os.listdir(DATASET_DIR) if f.lower().endswith(allowed)]   
     final_sim = 0
@@ -126,6 +146,33 @@ def check():
         scores = cosine_similarity(vecs[-1:], vecs[:-1])[0]
         final_sim = round(max(scores) * 100, 2)     
     ai_pct, ai_details = scan_for_ai(input_text)
+
+    if input_text.strip():
+        if filename:
+            name, ext = os.path.splitext(filename)
+            clean_name = re.sub(r'[^a-zA-Z0-9_-]', '_', name)
+            if not ext:
+                ext = '.txt'
+            save_name = f"user_{int(time.time())}_{clean_name}{ext}"
+        else:
+            save_name = f"user_{int(time.time())}.txt"
+        
+        try:
+            with open(os.path.join(DATASET_DIR, save_name), 'w', encoding='utf-8') as f:
+                f.write(input_text)
+        except Exception as e:
+            print("Error saving to dataset:", e)
+    if user_id:
+        try:
+            db = connect_db()
+            db.execute('''
+                INSERT INTO history (user_id, filename, plagiarism_score, ai_score, original_text)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, filename or "Raw Text", final_sim, ai_pct, input_text))
+            db.commit()
+        except Exception as db_err:
+            print("Error saving to history database:", db_err)
+
     return jsonify({
         'plagiarism_score': final_sim,
         'ai_score': ai_pct,
@@ -134,6 +181,40 @@ def check():
         'original_text': input_text
     })
 
+@app.route('/history/<int:user_id>', methods=['GET'])
+def get_history(user_id):
+    try:
+        db = connect_db()
+        cursor = db.execute('''
+            SELECT id, filename, plagiarism_score, ai_score, timestamp, original_text 
+            FROM history 
+            WHERE user_id = ? 
+            ORDER BY id DESC
+        ''', (user_id,))
+        rows = cursor.fetchall()
+        history_list = []
+        for r in rows:
+            history_list.append({
+                'id': r[0],
+                'filename': r[1],
+                'plagiarism_score': r[2],
+                'ai_score': r[3],
+                'timestamp': r[4],
+                'original_text': r[5]
+            })
+        return jsonify(history_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/history/<int:scan_id>', methods=['DELETE'])
+def delete_scan(scan_id):
+    try:
+        db = connect_db()
+        db.execute('DELETE FROM history WHERE id = ?', (scan_id,))
+        db.commit()
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 @app.route('/report', methods=['POST'])
 def build_report():
     try:
@@ -185,8 +266,21 @@ def handle_contact():
         return jsonify({'error': str(e)}), 500
 
 if not os.path.exists(DATASET_DIR):
-    os.makedirs(DATASET_DIR)
+    try:
+        os.makedirs(DATASET_DIR)
+    except Exception as e:
+        print("Error creating dataset folder:", e)
+old_dataset_dir = os.path.join(BASE_DIR, 'dataset')
+if os.path.exists(old_dataset_dir) and os.path.exists(DATASET_DIR):
+    import shutil
+    for item in os.listdir(old_dataset_dir):
+        s = os.path.join(old_dataset_dir, item)
+        d = os.path.join(DATASET_DIR, item)
+        if os.path.isfile(s) and not os.path.exists(d):
+            try:
+                shutil.copy2(s, d)
+            except Exception as e:
+                print(f"Migration copy error for {item}: {e}")
 init_db()
-
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
