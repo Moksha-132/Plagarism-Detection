@@ -10,6 +10,9 @@ from report_pdf import create_pdf_report
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -155,8 +158,8 @@ def handle_contact():
         return jsonify({'error': 'Missing fields'}), 400
 
     try:
-        sender_email = "lmoksha.132@gmail.com"
-        sender_password = "hxxr nfku sdus yeqr"
+        sender_email = os.environ.get("EMAIL_USER")
+        sender_password = os.environ.get("EMAIL_PASS")
         
         msg = MIMEMultipart()
         msg['From'] = sender_email
