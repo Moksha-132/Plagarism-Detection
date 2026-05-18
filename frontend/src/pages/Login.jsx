@@ -14,7 +14,7 @@ function Login() {
       alert('Please accept the Terms & Conditions and Privacy Policy to proceed.');
       return;
     }
-    const res = await fetch('http://localhost:5000/login', {
+    const res = await fetch('https://moksha132.pythonanywhere.com/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })

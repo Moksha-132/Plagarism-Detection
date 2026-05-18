@@ -14,7 +14,7 @@ function Contact() {
     e.preventDefault();
     setStatus('Sending...');
     try {
-      const res = await fetch('http://localhost:5000/contact', {
+      const res = await fetch('https://moksha132.pythonanywhere.com/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, message })

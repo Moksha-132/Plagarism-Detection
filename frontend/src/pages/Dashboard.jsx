@@ -31,7 +31,7 @@ function Dashboard() {
       formData.append('text', text);
     }
 
-    const res = await fetch('http://localhost:5000/check', {
+    const res = await fetch('https://moksha132.pythonanywhere.com/check', {
       method: 'POST',
       body: file ? formData : JSON.stringify({ text }),
       headers: file ? {} : { 'Content-Type': 'application/json' }
@@ -54,7 +54,7 @@ function Dashboard() {
     if (!results) return;
 
     try {
-      const res = await fetch('http://localhost:5000/report', {
+      const res = await fetch('https://moksha132.pythonanywhere.com/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
