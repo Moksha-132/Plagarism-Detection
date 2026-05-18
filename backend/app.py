@@ -3,9 +3,13 @@ from flask_cors import CORS
 import sqlite3
 import os
 import math
+import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from report_pdf import create_pdf_report
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 CORS(app)
@@ -34,20 +38,30 @@ def get_entropy_score(input_text):
     return val
 
 def scan_for_ai(content):
-    chunks = content.split('\n')
+    raw_lines = content.split('\n')
+    chunks = []
+    for line in raw_lines:
+        if len(line.strip()) > 150 and not any(c in line for c in ['{', '}', ';']):
+            sentences = re.split(r'(?<=[.!?]) +', line)
+            chunks.extend(sentences)
+        else:
+            chunks.append(line)
     scanned_lines = [] 
-    overall_entropy = get_entropy_score(content)  
+    overall_entropy = get_entropy_score(content)
+    is_large_project = len(content) > 1000 or len(raw_lines) > 50
+    is_complex = overall_entropy > 4.2
+    use_project_mode = is_large_project and is_complex
     for c in chunks:
         clean_c = c.strip()      
-        is_code_line = any(char in clean_c for char in ['(', ')', ':', '=', '[', ']', '{', '}', '<', '>', '/', ';', ',', '"', "'"])  
-        min_len = 35 if is_code_line else 12   
+        is_code_line = any(char in clean_c for char in ['(', ')', ':', '=', '[', ']', '{', '}', '<', '>', '/', ';'])  
+        min_len = 25 if (use_project_mode and is_code_line) else 12
         if len(clean_c) < min_len:
             scanned_lines.append({'text': c, 'is_ai': False, 'score': 0})
             continue         
         e_score = get_entropy_score(c)
-        threshold = 2.2 if is_code_line else 3.8  
-        if overall_entropy > 3.5 and is_code_line:
-             threshold = 1.6     
+        threshold = 2.45 if is_code_line else 3.9  
+        if use_project_mode and is_code_line:
+             threshold = 1.5     
         flag_ai = e_score < threshold 
         pct = 0
         if flag_ai:
@@ -129,6 +143,39 @@ def build_report():
         )
     except Exception as err:
         return jsonify({'error': str(err)}), 500
+
+@app.route('/contact', methods=['POST'])
+def handle_contact():
+    data = request.json
+    name = data.get('name', '')
+    email = data.get('email', '')
+    message = data.get('message', '')
+
+    if not name or not email or not message:
+        return jsonify({'error': 'Missing fields'}), 400
+
+    try:
+        sender_email = "lmoksha.132@gmail.com"
+        sender_password = "hxxr nfku sdus yeqr"
+        
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = sender_email
+        msg['Subject'] = f"New Contact Submission from {name}"
+
+        body = f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+
+        return jsonify({'status': 'Message sent successfully'})
+    except Exception as e:
+        print("Mail error:", str(e))
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     if not os.path.exists('dataset'):

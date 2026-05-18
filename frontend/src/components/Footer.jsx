@@ -51,9 +51,9 @@ function Footer() {
         <div style={{ borderTop: '1px solid #1e292f', paddingTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', color: '#94a3b8' }}>
           <div>© 2026 PlagCheck System. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '2rem' }}>
-            <span>Privacy Policy</span>
-            <span>Terms & Conditions</span>
-            <span>Company Profile</span>
+            <Link to="/privacy-policy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
+            <Link to="/terms-conditions" style={{ color: 'inherit', textDecoration: 'none' }}>Terms & Conditions</Link>
+            <a href="/Shnoor_Company_Profile (1).pdf" download="Shnoor_Company_Profile.pdf" style={{ color: 'inherit', textDecoration: 'none' }}>Company Profile</a>
           </div>
         </div>
       </div>

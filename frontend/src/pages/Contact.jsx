@@ -1,10 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 
 function Contact() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('Sending...');
+    try {
+      const res = await fetch('http://localhost:5000/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+      if (res.ok) {
+        setStatus('Message sent successfully!');
+        setName('');
+        setEmail('');
+        setMessage('');
+      } else {
+        setStatus('Failed to send message.');
+      }
+    } catch (err) {
+      setStatus('Failed to send message.');
+    }
+  };
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -77,11 +103,12 @@ function Contact() {
             transition={{ delay: 0.4, duration: 0.6 }}
           >
             <h2 style={{ marginBottom: '2rem' }}>Send a Message</h2>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <input type="text" placeholder="Your Name" required />
-              <input type="email" placeholder="Email Address" required />
-              <textarea style={{ height: '150px', background: '#f8fafc', border: '1px solid var(--border)', borderRadius: '12px', padding: '1rem', width: '100%', marginBottom: '1rem' }} placeholder="How can we help?"></textarea>
+            <form onSubmit={handleSubmit}>
+              <input type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <textarea style={{ height: '150px', background: '#f8fafc', border: '1px solid var(--border)', borderRadius: '12px', padding: '1rem', width: '100%', marginBottom: '1rem' }} placeholder="How can we help?" value={message} onChange={(e) => setMessage(e.target.value)} required></textarea>
               <button style={{ width: '100%' }}>Send Message</button>
+              {status && <p style={{ marginTop: '1rem', color: status.includes('success') ? 'green' : 'red', fontWeight: '500' }}>{status}</p>}
             </form>
           </motion.div>
         </div>

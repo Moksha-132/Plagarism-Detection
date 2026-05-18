@@ -5,10 +5,15 @@ import Footer from '../components/Footer';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(sessionStorage.getItem('acceptedTerms') === 'true');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!acceptTerms) {
+      alert('Please accept the Terms & Conditions and Privacy Policy to proceed.');
+      return;
+    }
     const res = await fetch('http://localhost:5000/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -56,7 +61,30 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button type="submit" style={{ width: '100%', marginTop: '1rem', padding: '1rem' }}>Access Dashboard</button>
+            
+            <div style={{ marginBottom: '1.5rem', textAlign: 'left', fontSize: '0.9rem', color: 'var(--text-dim)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={acceptTerms} 
+                  onClick={(e) => {
+                    if (!acceptTerms) {
+                      e.preventDefault();
+                      alert('Please read our Terms & Conditions and Privacy Policy by clicking the links, and accept them there.');
+                    }
+                  }}
+                  onChange={(e) => {
+                    setAcceptTerms(e.target.checked);
+                    sessionStorage.setItem('acceptedTerms', e.target.checked.toString());
+                  }} 
+                  required 
+                  style={{ marginRight: '0.5rem', width: 'auto' }} 
+                />
+                <span>I accept the <Link to="/terms-conditions" state={{ fromAuth: true }} style={{ color: 'var(--primary)' }}>Terms & Conditions</Link> and <Link to="/privacy-policy" state={{ fromAuth: true }} style={{ color: 'var(--primary)' }}>Privacy Policy</Link></span>
+              </label>
+            </div>
+
+            <button type="submit" style={{ width: '100%', padding: '1rem' }}>Access Dashboard</button>
           </form>
           
           <p className="link-text" style={{ marginTop: '2rem' }}>
