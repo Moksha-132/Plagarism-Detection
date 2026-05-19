@@ -29,28 +29,28 @@ function Footer() {
           <div className="footer-col">
             <h4>Contact & Support</h4>
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-              <Mail size={20} color="var(--primary)" />
+              <Mail size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
               <div>
                 <p style={{ color: 'white' }}>info@shnoor.com</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-              <Phone size={20} color="var(--primary)" />
+              <Phone size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
               <div>
                 <p style={{ color: 'white' }}>+91-9429694298</p>
                 <p style={{ color: 'white' }}>+91-9041914601</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <MapPin size={20} color="var(--primary)" />
+              <MapPin size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
               <p style={{ color: 'white' }}>10009 Mount Tabor Road, City, Odessa<br />Missouri, United States</p>
             </div>
           </div>
         </div>
         
-        <div style={{ borderTop: '1px solid #1e292f', paddingTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', color: '#94a3b8' }}>
+        <div className="footer-bottom" style={{ borderTop: '1px solid #1e292f', paddingTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', color: '#94a3b8' }}>
           <div>© 2026 PlagCheck System. All rights reserved.</div>
-          <div style={{ display: 'flex', gap: '2rem' }}>
+          <div className="footer-bottom-links" style={{ display: 'flex', gap: '2rem' }}>
             <Link to="/privacy-policy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
             <Link to="/terms-conditions" style={{ color: 'inherit', textDecoration: 'none' }}>Terms & Conditions</Link>
             <a href="/Shnoor_Company_Profile (1).pdf" download="Shnoor_Company_Profile.pdf" style={{ color: 'inherit', textDecoration: 'none' }}>Company Profile</a>

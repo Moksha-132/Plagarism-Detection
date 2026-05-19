@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Globe, Cpu, Shield, Upload, FileText, CheckCircle } from 'lucide-react';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 
@@ -21,26 +22,9 @@ function Landing() {
 
   return (
     <div>
+      <Navbar />
+      
       <div className="container">
-        <motion.nav 
-          className="navbar"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="logo">PlagCheck</div>
-          <div className="nav-links">
-            <a href="#features" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginLeft: '2rem', fontWeight: 500 }}>Features</a>
-            <a href="#how-it-works" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginLeft: '2rem', fontWeight: 500 }}>How It Works</a>
-            <a href="#about" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginLeft: '2rem', fontWeight: 500 }}>About Us</a>
-            <Link to="/contact" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginLeft: '2rem', fontWeight: 500 }}>Contact</Link>
-            <Link to="/login" style={{ marginLeft: '2rem' }}>Log In</Link>
-            <Link to="/register">
-              <button>Get Started</button>
-            </Link>
-          </div>
-        </motion.nav>
-        
         <section className="hero">
           <motion.h1 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -67,17 +51,17 @@ function Landing() {
           </motion.div>
         </section>
 
-        <section id="features" style={{ padding: '8rem 0' }}>
+        <section id="features" style={{ padding: '5rem 0' }}>
           <motion.div 
             style={{ textAlign: 'center', marginBottom: '4rem' }}
             {...fadeInUp}
           >
-            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1.5rem' }}>Powerful <span className="text-gradient">Features.</span></h2>
+            <h2 className="section-title" style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1.5rem' }}>Powerful <span className="text-gradient">Features.</span></h2>
             <p style={{ color: 'var(--text-dim)', fontSize: '1.15rem', maxWidth: '700px', margin: '0 auto' }}>Equipped with state-of-the-art tools to maintain the highest standards of originality.</p>
           </motion.div>
 
           <motion.div 
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 2fr)', gap: '2rem' }}
+            className="features-grid"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -107,17 +91,17 @@ function Landing() {
           </motion.div>
         </section>
 
-        <section id="how-it-works" style={{ padding: '8rem 0' }}>
+        <section id="how-it-works" style={{ padding: '5rem 0' }}>
           <motion.div 
             style={{ textAlign: 'center', marginBottom: '4rem' }}
             {...fadeInUp}
           >
-            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1.5rem' }}>How it <span className="text-gradient">Works.</span></h2>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1.5rem' }}>How it <span className="text-gradient">Works.</span></h2>
             <p style={{ color: 'var(--text-dim)', fontSize: '1.15rem', maxWidth: '700px', margin: '0 auto' }}>Our platform uses advanced mathematical algorithms to ensure the integrity of your work in three simple steps.</p>
           </motion.div>
           
           <motion.div 
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}
+            className="steps-grid"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -141,12 +125,12 @@ function Landing() {
           </motion.div>
         </section>
 
-        <section id="about" style={{ padding: '8rem 0' }}>
+        <section id="about" style={{ padding: '5rem 0' }}>
           <motion.div 
             style={{ textAlign: 'center', marginBottom: '4rem' }}
             {...fadeInUp}
           >
-            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1.5rem' }}>About <span className="text-gradient">Us.</span></h2>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1.5rem' }}>About <span className="text-gradient">Us.</span></h2>
             <p style={{ color: 'var(--text-dim)', fontSize: '1.15rem', maxWidth: '700px', margin: '0 auto' }}>We are dedicated to maintaining the global standards of academic and professional integrity through innovative technology.</p>
           </motion.div>
 
@@ -158,7 +142,7 @@ function Landing() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+            <div className="about-grid">
               <div>
                 <h3 style={{ marginBottom: '1.5rem', color: 'var(--dark-bg)' }}>Our Mission</h3>
                 <p style={{ color: 'var(--text-dim)' }}>

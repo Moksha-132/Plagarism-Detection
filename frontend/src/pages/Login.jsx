@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 function Login() {
@@ -31,18 +32,10 @@ function Login() {
 
   return (
     <div>
-      <div className="container">
-        <nav className="navbar">
-          <div className="logo">PlagCheck</div>
-          <div className="nav-links" style={{ display: 'flex', alignItems: 'center' }}>
-            <Link to="/" style={{ marginRight: '2rem', color: 'var(--text-dim)', textDecoration: 'none', fontWeight: '600' }}>Home</Link>
-            <Link to="/register">
-              <button style={{ padding: '0.6rem 1.5rem', fontSize: '0.9rem' }}>Create Account</button>
-            </Link>
-          </div>
-        </nav>
+      <Navbar />
 
-        <div className="auth-form card" style={{ marginTop: '6rem', marginBottom: '10rem' }}>
+      <div className="container" style={{ paddingTop: '2rem' }}>
+        <div className="auth-form card" style={{ marginTop: '2rem', marginBottom: '8rem' }}>
           <h2 style={{ marginBottom: '1.5rem', textAlign: 'center', color: '#0a192f' }}>Sign In to PlagCheck</h2>
           <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '2rem' }}>Enter your details to access the originality scanner.</p>
 
@@ -63,7 +56,7 @@ function Login() {
             />
 
             <div style={{ marginBottom: '1.5rem', textAlign: 'left', fontSize: '0.9rem', color: 'var(--text-dim)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
                 <input
                   type="checkbox"
                   checked={acceptTerms}
@@ -78,7 +71,7 @@ function Login() {
                     sessionStorage.setItem('acceptedTerms', e.target.checked.toString());
                   }}
                   required
-                  style={{ marginRight: '0.5rem', width: 'auto' }}
+                  style={{ marginRight: '0.5rem', marginTop: '0.25rem', width: 'auto', flexShrink: 0 }}
                 />
                 <span>I accept the <Link to="/terms-conditions" state={{ fromAuth: true }} style={{ color: 'var(--primary)' }}>Terms & Conditions</Link> and <Link to="/privacy-policy" state={{ fromAuth: true }} style={{ color: 'var(--primary)' }}>Privacy Policy</Link></span>
               </label>

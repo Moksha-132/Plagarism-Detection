@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 
@@ -31,6 +31,7 @@ function Contact() {
       setStatus('Failed to send message.');
     }
   };
+
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -39,30 +40,19 @@ function Contact() {
 
   return (
     <div>
-      <div className="container">
-        <motion.nav
-          className="navbar"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="logo">PlagCheck</div>
-          <div className="nav-links">
-            <Link to="/" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginLeft: '2rem', fontWeight: 500 }}>Home</Link>
-            <Link to="/login" style={{ marginLeft: '2rem' }}>Log In</Link>
-          </div>
-        </motion.nav>
+      <Navbar />
 
+      <div className="container" style={{ paddingTop: '2rem' }}>
         <motion.section
           className="hero"
-          style={{ padding: '6rem 0' }}
+          style={{ padding: '4rem 0' }}
           {...fadeInUp}
         >
           <h1>Get in <span className="text-gradient">Touch.</span></h1>
           <p>Have questions about our scanner or enterprise solutions? Our team is here to help you.</p>
         </motion.section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', marginBottom: '8rem' }}>
+        <div className="contact-grid">
           <motion.div
             className="card"
             initial={{ opacity: 0, x: -30 }}
@@ -72,7 +62,7 @@ function Contact() {
             <h2 style={{ marginBottom: '2rem' }}>Contact Information</h2>
 
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
-              <Mail color="var(--primary)" />
+              <Mail color="var(--primary)" style={{ flexShrink: 0 }} />
               <div>
                 <p style={{ fontWeight: '700' }}>Email Us</p>
                 <p style={{ color: 'var(--text-dim)' }}>info@shnoor.com</p>
@@ -80,7 +70,7 @@ function Contact() {
             </div>
 
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
-              <Phone color="var(--primary)" />
+              <Phone color="var(--primary)" style={{ flexShrink: 0 }} />
               <div>
                 <p style={{ fontWeight: '700' }}>Call Us</p>
                 <p style={{ color: 'var(--text-dim)' }}>+91-9429694298</p>
@@ -88,7 +78,7 @@ function Contact() {
             </div>
 
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-              <MapPin color="var(--primary)" />
+              <MapPin color="var(--primary)" style={{ flexShrink: 0 }} />
               <div>
                 <p style={{ fontWeight: '700' }}>Our Location</p>
                 <p style={{ color: 'var(--text-dim)' }}>10009 Mount Tabor Road, City, Odessa<br />Missouri, United States</p>
@@ -106,7 +96,22 @@ function Contact() {
             <form onSubmit={handleSubmit}>
               <input type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} required />
               <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <textarea style={{ height: '150px', background: '#f8fafc', border: '1px solid var(--border)', borderRadius: '12px', padding: '1rem', width: '100%', marginBottom: '1rem' }} placeholder="How can we help?" value={message} onChange={(e) => setMessage(e.target.value)} required></textarea>
+              <textarea 
+                style={{ 
+                  height: '150px', 
+                  background: '#f8fafc', 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '12px', 
+                  padding: '1rem', 
+                  width: '100%', 
+                  marginBottom: '1rem',
+                  resize: 'none'
+                }} 
+                placeholder="How can we help?" 
+                value={message} 
+                onChange={(e) => setMessage(e.target.value)} 
+                required
+              ></textarea>
               <button style={{ width: '100%' }}>Send Message</button>
               {status && <p style={{ marginTop: '1rem', color: status.includes('success') ? 'green' : 'red', fontWeight: '500' }}>{status}</p>}
             </form>

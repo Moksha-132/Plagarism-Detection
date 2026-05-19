@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 function Register() {
@@ -25,18 +26,10 @@ function Register() {
 
   return (
     <div>
-      <div className="container">
-        <nav className="navbar">
-          <div className="logo">PlagCheck</div>
-          <div className="nav-links" style={{ display: 'flex', alignItems: 'center' }}>
-            <Link to="/" style={{ marginRight: '2rem', color: 'var(--text-dim)', textDecoration: 'none', fontWeight: '600' }}>Home</Link>
-            <Link to="/login">
-              <button style={{ padding: '0.6rem 1.5rem', fontSize: '0.9rem' }}>Log In</button>
-            </Link>
-          </div>
-        </nav>
+      <Navbar />
 
-        <div className="auth-form card" style={{ marginTop: '6rem', marginBottom: '10rem' }}>
+      <div className="container" style={{ paddingTop: '2rem' }}>
+        <div className="auth-form card" style={{ marginTop: '2rem', marginBottom: '8rem' }}>
           <h2 style={{ marginBottom: '1.5rem', textAlign: 'center', color: '#0a192f' }}>Join PlagCheck</h2>
           <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '2rem' }}>Create an account to start protecting your original work.</p>
 

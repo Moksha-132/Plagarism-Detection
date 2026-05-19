@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 function TermsConditions() {
@@ -10,15 +11,10 @@ function TermsConditions() {
 
   return (
     <div>
-      <div className="container">
-        <nav className="navbar">
-          <div className="logo">PlagCheck</div>
-          <div className="nav-links">
-            <Link to="/" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontWeight: 500 }}>Home</Link>
-          </div>
-        </nav>
-        
-        <div className="card" style={{ marginTop: '4rem', marginBottom: '8rem', padding: '3rem' }}>
+      <Navbar />
+      
+      <div className="container" style={{ paddingTop: '2rem' }}>
+        <div className="card" style={{ marginTop: '2rem', marginBottom: '8rem' }}>
           <h1 style={{ marginBottom: '2rem' }}>Terms and Conditions</h1>
           <div style={{ lineHeight: '1.8', color: 'var(--text-dim)' }}>
             <p style={{ marginBottom: '1rem' }}>Last updated: May 2026</p>
@@ -41,7 +37,7 @@ function TermsConditions() {
                     sessionStorage.setItem('acceptedTerms', 'true');
                     navigate(-1);
                   }}
-                  style={{ padding: '1rem 3rem', fontSize: '1.1rem' }}
+                  style={{ padding: '1rem 3rem', fontSize: '1.1rem', width: '100%', maxWidth: '350px' }}
                 >
                   Accept and Return to Login
                 </button>
@@ -52,7 +48,7 @@ function TermsConditions() {
               <div style={{ marginTop: '3rem', textAlign: 'center' }}>
                 <button 
                   onClick={() => navigate(-1)}
-                  style={{ padding: '1rem 3rem', fontSize: '1.1rem' }}
+                  style={{ padding: '1rem 3rem', fontSize: '1.1rem', width: '100%', maxWidth: '350px' }}
                 >
                   I Accept
                 </button>
