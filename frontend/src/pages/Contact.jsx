@@ -42,7 +42,7 @@ function Contact() {
     <div>
       <Navbar />
 
-      <div className="container" style={{ paddingTop: '2rem' }}>
+      <main className="container" style={{ paddingTop: '2rem' }}>
         <motion.section
           className="hero"
           style={{ padding: '4rem 0' }}
@@ -117,7 +117,7 @@ function Contact() {
             </form>
           </motion.div>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

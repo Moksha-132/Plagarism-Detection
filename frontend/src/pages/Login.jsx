@@ -34,7 +34,7 @@ function Login() {
     <div>
       <Navbar />
 
-      <div className="container" style={{ paddingTop: '2rem' }}>
+      <main className="container" style={{ paddingTop: '2rem' }}>
         <div className="auth-form card" style={{ marginTop: '2rem', marginBottom: '8rem' }}>
           <h2 style={{ marginBottom: '1.5rem', textAlign: 'center', color: '#0a192f' }}>Sign In to PlagCheck</h2>
           <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '2rem' }}>Enter your details to access the originality scanner.</p>
@@ -84,7 +84,7 @@ function Login() {
             New to PlagCheck? <Link to="/register">Create an account</Link>
           </p>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

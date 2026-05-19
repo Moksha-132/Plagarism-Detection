@@ -13,7 +13,7 @@ function PrivacyPolicy() {
     <div>
       <Navbar />
       
-      <div className="container" style={{ paddingTop: '2rem' }}>
+      <main className="container" style={{ paddingTop: '2rem' }}>
         <div className="card" style={{ marginTop: '2rem', marginBottom: '8rem' }}>
           <h1 style={{ marginBottom: '2rem' }}>Privacy Policy</h1>
           <div style={{ lineHeight: '1.8', color: 'var(--text-dim)' }}>
@@ -56,7 +56,7 @@ function PrivacyPolicy() {
             )}
           </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

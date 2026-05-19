@@ -28,7 +28,7 @@ function Register() {
     <div>
       <Navbar />
 
-      <div className="container" style={{ paddingTop: '2rem' }}>
+      <main className="container" style={{ paddingTop: '2rem' }}>
         <div className="auth-form card" style={{ marginTop: '2rem', marginBottom: '8rem' }}>
           <h2 style={{ marginBottom: '1.5rem', textAlign: 'center', color: '#0a192f' }}>Join PlagCheck</h2>
           <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '2rem' }}>Create an account to start protecting your original work.</p>
@@ -55,7 +55,7 @@ function Register() {
             Already have an account? <Link to="/login">Sign in here</Link>
           </p>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

@@ -24,7 +24,7 @@ function Landing() {
     <div>
       <Navbar />
       
-      <div className="container">
+      <main className="container">
         <section className="hero">
           <motion.h1 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -158,7 +158,7 @@ function Landing() {
             </div>
           </motion.div>
         </section>
-      </div>
+      </main>
 
       <Footer />
     </div>

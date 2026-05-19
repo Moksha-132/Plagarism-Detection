@@ -162,7 +162,7 @@ function Dashboard() {
     <div>
       <Navbar />
 
-      <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem' }}>
+      <main className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem' }}>
         <div className="card">
           <h2 style={{ color: '#0a192f', marginBottom: '0.5rem' }}>Full Content Analysis</h2>
           <p style={{ color: '#64748b', marginBottom: '2rem' }}>Check for plagiarism and AI-generated content in your code or scripts.</p>
@@ -427,7 +427,7 @@ function Dashboard() {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
