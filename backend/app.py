@@ -5,6 +5,7 @@ import os
 import math
 import re
 import time
+import secrets
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from report_pdf import create_pdf_report
@@ -12,6 +13,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -37,6 +39,12 @@ def init_db():
         timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
         original_text TEXT,
         FOREIGN KEY(user_id) REFERENCES users(id)
+    )''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS reset_tokens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        token TEXT,
+        expires_at REAL
     )''')
     conn.commit()
 
@@ -263,6 +271,88 @@ def handle_contact():
         return jsonify({'status': 'Message sent successfully'})
     except Exception as e:
         print("Mail error:", str(e))
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    payload = request.json or {}
+    username = payload.get('username', '').strip()
+    frontend_url = payload.get('frontend_url', 'http://localhost:5173')
+
+    if not username:
+        return jsonify({'error': 'Email / Username is required'}), 400
+
+    db = connect_db()
+    user = db.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone()
+    
+    if not user:
+        return jsonify({'error': 'User with this email/username does not exist'}), 404
+
+    token = secrets.token_urlsafe(32)
+    expires_at = time.time() + 3600
+
+    try:
+        db.execute('DELETE FROM reset_tokens WHERE username = ?', (username,))
+        db.execute('INSERT INTO reset_tokens (username, token, expires_at) VALUES (?, ?, ?)', (username, token, expires_at))
+        db.commit()
+
+        sender_email = os.environ.get("EMAIL_USER")
+        sender_password = os.environ.get("EMAIL_PASS")
+        
+        if not sender_email or not sender_password:
+            return jsonify({'error': 'SMTP credentials not configured in backend .env'}), 500
+
+        reset_link = f"{frontend_url}/reset-password?token={token}"
+
+        msg = MIMEMultipart()
+        msg['From'] = f"PlagCheck Support <{sender_email}>"
+        msg['To'] = username
+        msg['Subject'] = "PlagCheck Password Reset Request"
+
+        reset_email_path = os.path.join(BASE_DIR, 'reset_email.html')
+        with open(reset_email_path, 'r', encoding='utf-8') as f_template:
+            html_body = f_template.read().replace('{reset_link}', reset_link)
+
+        msg.attach(MIMEText(html_body, 'html'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+
+        return jsonify({'status': 'ok', 'message': 'Reset link sent to your email successfully.'})
+    except Exception as e:
+        print("Forgot Password Mail error:", str(e))
+        return jsonify({'error': f"Failed to send email: {str(e)}"}), 500
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    payload = request.json or {}
+    token = payload.get('token', '').strip()
+    new_password = payload.get('password', '').strip()
+
+    if not token or not new_password:
+        return jsonify({'error': 'Token and new password are required'}), 400
+
+    db = connect_db()
+    row = db.execute('SELECT username, expires_at FROM reset_tokens WHERE token = ?', (token,)).fetchone()
+
+    if not row:
+        return jsonify({'error': 'Invalid reset token'}), 400
+
+    username, expires_at = row
+    if time.time() > expires_at:
+        db.execute('DELETE FROM reset_tokens WHERE token = ?', (token,))
+        db.commit()
+        return jsonify({'error': 'Reset token has expired'}), 400
+
+    try:
+        db.execute('UPDATE users SET password = ? WHERE username = ?', (new_password, username))
+        db.execute('DELETE FROM reset_tokens WHERE username = ?', (username,))
+        db.commit()
+        return jsonify({'status': 'ok', 'message': 'Password has been reset successfully.'})
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if not os.path.exists(DATASET_DIR):

@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000'
+  : 'https://moksha132.pythonanywhere.com';
+
 function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -10,7 +14,7 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch('https://moksha132.pythonanywhere.com/register', {
+    const res = await fetch(`${API_BASE}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })

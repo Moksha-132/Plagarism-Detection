@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000'
+  : 'https://moksha132.pythonanywhere.com';
+
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +19,7 @@ function Login() {
       alert('Please accept the Terms & Conditions and Privacy Policy to proceed.');
       return;
     }
-    const res = await fetch('https://moksha132.pythonanywhere.com/login', {
+    const res = await fetch(`${API_BASE}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -54,6 +58,12 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-0.5rem', marginBottom: '1.25rem' }}>
+              <Link to="/forgot-password" style={{ fontSize: '0.85rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
+                Forgot Password?
+              </Link>
+            </div>
 
             <div style={{ marginBottom: '1.5rem', textAlign: 'left', fontSize: '0.9rem', color: 'var(--text-dim)' }}>
               <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
